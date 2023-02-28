@@ -113,6 +113,10 @@ const STYLE = {
 
 Object.assign(appDiv.style, STYLE);
 
+const H1 = document.createElement('h1');
+H1.innerHTML = 'COMANDO: ';
+appDiv.appendChild(H1);
+
 function createRow() {
   const DIV = document.createElement('div');
   DIV.setAttribute('row', row);
@@ -226,8 +230,12 @@ const COMMAND = {
   r: '00000000',
   g: '00000000',
   b: '00000000',
-  t: '00000000',
+  t: '11111111',
 };
+
+const DIV_CONTAINER = document.createElement('div');
+DIV_CONTAINER.style.width = '100%;'
+DIV_CONTAINER.style.display = 'flex';
 
 const DIV_R = document.createElement('div');
 const DIV_R_LABEL = document.createElement('div');
@@ -245,12 +253,13 @@ INPUT_R.addEventListener(
     DIV_R_LABEL.innerHTML = `RED: ${e.target.value}`;
     let v = parseInt(e.target.value);
     COMMAND.r = toBinary8Bits(v);
+    INPUT_R.blur();
   },
   false
 );
 DIV_R.appendChild(DIV_R_LABEL);
 DIV_R.appendChild(INPUT_R);
-appDiv.appendChild(DIV_R);
+DIV_CONTAINER.appendChild(DIV_R);
 
 const DIV_G = document.createElement('div');
 const DIV_G_LABEL = document.createElement('div');
@@ -268,12 +277,13 @@ INPUT_G.addEventListener(
     DIV_G_LABEL.innerHTML = `GREEN: ${e.target.value}`;
     let v = parseInt(e.target.value);
     COMMAND.g = toBinary8Bits(v);
+    INPUT_G.blur();
   },
   false
 );
 DIV_G.appendChild(DIV_G_LABEL);
 DIV_G.appendChild(INPUT_G);
-appDiv.appendChild(DIV_G);
+DIV_CONTAINER.appendChild(DIV_G);
 
 const DIV_B = document.createElement('div');
 const DIV_B_LABEL = document.createElement('div');
@@ -291,54 +301,60 @@ INPUT_B.addEventListener(
     DIV_B_LABEL.innerHTML = `BLUE: ${e.target.value}`;
     let v = parseInt(e.target.value);
     COMMAND.b = toBinary8Bits(v);
+    INPUT_B.blur();
   },
   false
 );
 DIV_B.appendChild(DIV_B_LABEL);
 DIV_B.appendChild(INPUT_B);
-appDiv.appendChild(DIV_B);
+DIV_CONTAINER.appendChild(DIV_B);
 
 const DIV_T = document.createElement('div');
 const DIV_T_LABEL = document.createElement('div');
-DIV_T_LABEL.innerHTML = `TIME: ${0}`;
 DIV_T_LABEL.style.width = '100%';
 const INPUT_T = document.createElement('input');
 INPUT_T.type = 'range';
 INPUT_T.style.width = '100%;';
 INPUT_T.min = '0';
 INPUT_T.max = '255';
-INPUT_T.value = '0';
+INPUT_T.value = '255';
+DIV_T_LABEL.innerHTML = `TIME: ${INPUT_T.value}`;
 INPUT_T.addEventListener(
   'change',
   (e) => {
     DIV_T_LABEL.innerHTML = `TIME: ${e.target.value}`;
     let v = parseInt(e.target.value);
     COMMAND.t = toBinary8Bits(v);
+    INPUT_T.blur();
   },
   false
 );
 DIV_T.appendChild(DIV_T_LABEL);
 DIV_T.appendChild(INPUT_T);
-appDiv.appendChild(DIV_T);
+DIV_CONTAINER.appendChild(DIV_T);
 
 const BTN_ADD_MACHINE = document.createElement('button');
 BTN_ADD_MACHINE.innerHTML = 'ADD - MACHINE';
 BTN_ADD_MACHINE.addEventListener(
   'click',
   () => {
-    addElement();
+    if (count < 256) {
+      addElement();
+    }
+    BTN_ADD_MACHINE.blur();
   },
   false
 );
 
+appDiv.appendChild(DIV_CONTAINER);
 appDiv.appendChild(BTN_ADD_MACHINE);
 
 let c = '';
-let event = null;
+let eventTimeOut = null;
 
 const callback = () => {
-  if (event === null) {
-    event = setTimeout(() => {
+  if (eventTimeOut === null) {
+    eventTimeOut = setTimeout(() => {
       let v = parseInt(c);
       if (v < 256) {
         commander(
@@ -348,12 +364,12 @@ const callback = () => {
         );
       }
       c = '';
-      clearTimeout(event);
-      event = null;
+      clearTimeout(eventTimeOut);
+      eventTimeOut = null;
     }, 250);
   } else {
-    clearTimeout(event);
-    event = setTimeout(() => {
+    clearTimeout(eventTimeOut);
+    eventTimeOut = setTimeout(() => {
       let v = parseInt(c);
       if (v < 256) {
         commander(
@@ -363,8 +379,8 @@ const callback = () => {
         );
       }
       c = '';
-      clearTimeout(event);
-      event = null;
+      clearTimeout(eventTimeOut);
+      eventTimeOut = null;
     }, 250);
   }
 };
@@ -378,6 +394,7 @@ document.addEventListener(
       parseInt(e.key, 10) < 11
     ) {
       c += e.key;
+      H1.innerHTML = `COMANDO: ${c}`;
       callback();
     }
   },
