@@ -1,0 +1,12 @@
+{
+  "name": "dmx",
+  "version": "1.0.0",
+  "description": "test para comunicação dmx",
+  "main": "index.js",
+  "scripts": {
+    "test": "test",
+    "dev" : "node index.js"
+  },
+  "author": "Moisés Abdala de Sousa Filho",
+  "license": "ISC"
+}
